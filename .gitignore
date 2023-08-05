@@ -1,3 +1,5 @@
 apivenv
 __pycache__
 .env
+pgadmin_password.txt
+services
