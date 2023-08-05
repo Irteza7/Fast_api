@@ -21,8 +21,8 @@ services:
     image: dpage/pgadmin4
     restart: on-failure
     environment:
-      - PGADMIN_DEFAULT_EMAIL=${pgadmin4@pgadmin.org}
-      - PGADMIN_DEFAULT_PASSWORD=${admin}
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
       - PGADMIN_DEFAULT_PASSWORD_FILE=${PGADMIN_DEFAULT_PASSWORD_FILE}
     volumes:
       - ./services/data/pgadmin-data:/var/lib/pgadmin
