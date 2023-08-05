@@ -1,2 +1,3 @@
 apivenv
 __pycache__
+.env

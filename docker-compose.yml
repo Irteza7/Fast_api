@@ -1,0 +1,35 @@
+version: '3.4'
+services:
+  postgres:
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - ./services/data/pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
+      interval: 30s
+      retries: 5
+    env_file:
+      - .env
+    container_name: postgres-container
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: on-failure
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${pgadmin4@pgadmin.org}
+      - PGADMIN_DEFAULT_PASSWORD=${admin}
+      - PGADMIN_DEFAULT_PASSWORD_FILE=${PGADMIN_DEFAULT_PASSWORD_FILE}
+    volumes:
+      - ./services/data/pgadmin-data:/var/lib/pgadmin
+    ports:
+      - 8080:80
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    container_name: pgadmin-container
