@@ -13,6 +13,13 @@ router = APIRouter(prefix="/vote",
 async def votes(vote : schemas.Vote, db: Session = Depends(get_db), 
                 current_user : Session = Depends(oauth2.get_current_user)):
     
+    existing_post = db.query(models.Post).filter(models.Post.id == vote.post_id).first()
+    if existing_post is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Post with id {vote.post_id} does not exist"
+        )
+    
     vote_query = db.query(models.Vote).filter(models.Vote.post_id== vote.post_id,
                                                     models.Vote.user_id == current_user.id)
     
@@ -25,7 +32,10 @@ async def votes(vote : schemas.Vote, db: Session = Depends(get_db),
         db.add(vote_add)
         db.commit()
         db.refresh(vote_add)
-        return {"post liked"}
+        vote_count = db.query(models.Vote).filter(models.Vote.post_id == vote.post_id).count()
+
+        return {"post liked", f"vote_count is {vote_count}"}
+        
     else:
         if vote_query.first() is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -33,4 +43,7 @@ async def votes(vote : schemas.Vote, db: Session = Depends(get_db),
 
         vote_query.delete(synchronize_session=False)
         db.commit()
-        return {"post unliked"}
+        vote_count = db.query(models.Vote).filter(models.Vote.post_id == vote.post_id).count()
+
+        return {"post unliked", f"vote_count is {vote_count}"}
+
