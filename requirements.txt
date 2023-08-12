@@ -6,7 +6,7 @@ certifi==2023.7.22
 cffi==1.15.1
 click==8.1.6
 cryptography==41.0.3
-dnspython
+dnspython==2.4.1
 ecdsa==0.18.0
 email-validator==2.0.0.post2
 exceptiongroup==1.1.2
