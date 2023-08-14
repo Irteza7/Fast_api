@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+  api: 
+    build: .
+    depends_on:
+      - postgres
+    ports:
+        - 4000:8000
+    volumes:
+      - ./:/usr/src/app:ro
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    container_name: fast_api
+    environment:
+      - DATABASE_HOSTNAME=${DATABASE_HOSTNAME}
+      - DATABASE_USERNAME=${DATABASE_USERNAME}
+      - DATABASE_PORT=${DATABASE_PORT}
+      - DATABASE_NAME=${DATABASE_NAME} 
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DB_URL=${DB_URL}
+      - SECRET_KEY=${SECRET_KEY}
+      - ALGORITHM=${ALGORITHM}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
+    env_file:
+      - app/.env
+    # command: /bin/sh -c "env"
+
+  postgres:
+    image: postgres
+    ports:
+      - 5433:5432
+    environment:
+      # - POSTGRES_USER=${DATABASE_USERNAME}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_DB=${DATABASE_NAME}
+    env_file:
+      - app/.env
+    container_name: postgres
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+
+volumes:
+  postgres-db:

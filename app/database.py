@@ -3,14 +3,22 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import time
 import psycopg2
+import os
 from psycopg2.extras import RealDictCursor
 from app.config import settings
 
 # SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
-# SQLALCHEMY_DATABASE_URL = f"postgresql://{settings.database_username}:\
-#     {settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}?ssl=true"
+# Check for the environment
+deploy_env = os.environ.get("DEPLOY_ENV")
 
-SQLALCHEMY_DATABASE_URL = settings.db_url
+# If it's set to "render", construct the URL one way
+if deploy_env == "RENDER":
+    SQLALCHEMY_DATABASE_URL = settings.db_url
+# If it's set to "docker", construct it another way
+else:
+    SQLALCHEMY_DATABASE_URL = f"postgresql://{settings.database_username}:{settings.database_password}@postgres:{settings.database_port}/{settings.database_name}"
+
+
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL)
