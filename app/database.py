@@ -11,13 +11,13 @@ from app.config import settings
 # Check for the environment
 deploy_env = os.environ.get("DEPLOY_ENV")
 
-# If it's set to "render", construct the URL one way
+# Constructing the SQLAlchemy database URL
 if deploy_env == "RENDER":
-    SQLALCHEMY_DATABASE_URL = settings.db_url
-# If it's set to "docker", construct it another way
+    SQLALCHEMY_DATABASE_URL = settings.db_url   
+elif deploy_env == "DOCKER":
+    SQLALCHEMY_DATABASE_URL = f"postgresql://postgres:{settings.database_password}@postgres:{settings.database_port}/{settings.database_name}"
 else:
-    SQLALCHEMY_DATABASE_URL = f"postgresql://{settings.database_username}:{settings.database_password}@postgres:{settings.database_port}/{settings.database_name}"
-
+    SQLALCHEMY_DATABASE_URL = f"postgresql://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}"
 
 
 engine = create_engine(

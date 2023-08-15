@@ -10,19 +10,22 @@ from app.config import settings
 import os
 # Check for the environment
 deploy_env = os.environ.get("DEPLOY_ENV")
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 # config.set_main_option("sqlalchemy.url", f'postgresql://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}')
 # config.set_main_option("sqlalchemy.url", settings.db_url)
 
-
 # If it's set to "render", construct the URL one way
 if deploy_env == "RENDER":
     config.set_main_option("sqlalchemy.url", settings.db_url)
 # If it's set to "docker", construct it another way
+elif deploy_env == "DOCKER":
+    config.set_main_option("sqlalchemy.url", f'postgresql://postgres:{settings.database_password}@postgres:{settings.database_port}/{settings.database_name}')
+# If it's not set, assume local environment
 else:
-    config.set_main_option("sqlalchemy.url", f'postgresql://{settings.database_username}:{settings.database_password}@postgres:{settings.database_port}/{settings.database_name}')
+    config.set_main_option("sqlalchemy.url", f'postgresql://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}')
 
 
 # Interpret the config file for Python logging.
