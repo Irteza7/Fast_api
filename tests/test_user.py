@@ -1,58 +1,44 @@
-from http import client
 import pytest 
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from app.main import app
-from app.config import settings
-from app.database import get_db, Base
 from app import schemas
+from app.config import settings
+from jose import jwt
 
 # @pytest.mark.parametrize() # pass in multiple parameter sets to test diff input args
 # @pytest.fixture # function that runs before a specific test case
 # with pytest.raises(Exception) # to check if test fails if expected to fail
 
-SQLALCHEMY_DATABASE_URL = f"postgresql://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}_test"
 
-
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL)
-TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-
-# Dependency
-def override_get_db():
-    db = TestSessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-app.dependency_overrides[get_db] = override_get_db
-
-
-# client = TestClient(app)
-
-@pytest.fixture
-def client():
-    # run code before we run our test
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-    yield TestClient(app)
-    # run code after running the test
-    
-
-def test_root(client):
-    res = client.get("/")
-    print(res.json().get('message'))
-    assert res.json().get('message')== 'Hello World!!!'
-    assert res.status_code == 200
+# def test_root(client):
+#     res = client.get("/")
+#     # print(res.json().get('message'))
+#     assert res.json().get('message')== 'Hello World!!!'
+#     assert res.status_code == 200
 
 def test_create_user(client):
-    res = client.post("/users/", json={"email": "irteza@gmail.com",
+    res = client.post("/users/", json={"email": "hello123@gmail.com",
                                        "password": "pass123"})
     new_user = schemas.UserOut(**res.json())
     # print(res.json())
-    assert new_user.email == "irteza@gmail.com"
+    assert new_user.email == "hello123@gmail.com"
     assert res.status_code == 201
+
+def test_login_user(test_user, client):
+    res = client.post("/login", data={"username": test_user['email'], "password": test_user['password']})
+    # print(res.json())
+    login_res = schemas.Token(**res.json())
+    payload = jwt.decode(login_res.access_token, settings.secret_key, algorithms=[settings.algorithm])
+    id = payload.get("user_id")
+
+    assert id == test_user['id']
+    assert res.status_code == 200
+
+
+@pytest.mark.parametrize("username, password, status_code",
+                        [("wrongemail@gmail.com", "pass123", 403),
+                        ("hello123@gmail.com", "WrongPassword", 403),
+                        (None, "pass123", 422),
+                        ("123@gmail.com", None, 422)])
+def test_incorrect_login(test_user, client, username, password, status_code):
+    res = client.post("/login", data={"username": username, "password": password})
+
+    assert res.status_code == status_code   

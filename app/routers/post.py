@@ -106,6 +106,11 @@ async def update_post(post_id: int, post: schemas.PostCreate, db: Session = Depe
     if query_post.first() is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                             detail=f"Post id {post_id} doesn't exist")
+    
+    # Check if the current user is the owner of the post
+    if query_post.first().owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
+                            detail="Not authorized to update this post")
 
     query_post.update(post.model_dump())
 
