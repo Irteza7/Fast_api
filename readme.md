@@ -2,6 +2,14 @@
 
 A FastAPI-based web application with features like user authentication, post creation, and voting.
 
+## Introduction
+
+This project was undertaken to gain hands-on experience with various aspects of modern web development, including API development, database management with both ORM and raw SQL, continuous integration and deployment (CI/CD), unit testing, and deployment using Docker, Render, and Ubuntu. The primary goal was to build a robust and scalable application while exploring and mastering these tools.
+
+## Documentation
+
+For a detailed description of the project, please refer to the [PROJECT REPORT](report.md).
+
 ## Features
 
 - **User Registration and Authentication**: Securely register and authenticate users using JWT.
