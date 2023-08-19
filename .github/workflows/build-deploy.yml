@@ -11,7 +11,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Pulling git repo from github
-              uses: action/checkout@v3 
+              uses: actions/checkout@v3 
             - name: Say Hi to Irteza
               run: echo "Hello Irteza" 
             - name: Install python v 3.10
